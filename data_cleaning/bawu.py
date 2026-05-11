@@ -1,5 +1,15 @@
 import pandas as pd
 import numpy as np
+import requests
+
+url = "https://www.regionalstatistik.de/genesis/online"
+
+response = requests.get(url)
+
+response_json = response.json()
+print(response_json)
+
+
 
 bawu_raw = pd.read_csv('/Users/sohailludin/Desktop/01 Arbeit/01 Universität /03 Master/02 2. Semester/06 Softwarearchitekturen/Labor/cropprediction/data/raw/bawu_raw.csv', sep = ';')
 
