@@ -5,6 +5,7 @@ from streamlit_folium import st_folium
 import pandas as pd
 import joblib
 import branca.colormap as cm
+from shapely.wkt import loads
 
 
 @st.cache_resource
@@ -16,6 +17,8 @@ def get_predictions():
     gdf = gpd.read_file("../data/geodaten_pipeline/processed/landkreise_bawu_sauber.geojson")
     
     input_data = pd.read_csv('../ml-pipeline/features_2024_für_app.csv')
+
+    ernte_data = pd.read_csv('../data/yield_pipeline/clean/bawu_winterweizen_geerntet.csv', dtype={'Kreis-Id': str})
 
     for col in gdf.select_dtypes(include=['datetime64', 'datetimetz']).columns:
         gdf[col] = gdf[col].astype(str)
@@ -31,6 +34,23 @@ def get_predictions():
     gdf['ARS'] = gdf['ARS'].astype(str).str.zfill(5)
     
     gdf_final = gdf.merge(input_data[['Kreis-Id', 'Prognose_dt_ha']], left_on='ARS', right_on='Kreis-Id', how='left')
+
+
+    map_df = pd.DataFrame({
+      'Kreis-Id': ernte_data['Kreis-Id'],
+      'Stadt': ernte_data[' Stadt']
+    })
+
+    print(map_df.head())
+
+    
+    gdf_final['Kreis-Id'] = gdf_final['Kreis-Id'].astype(str)
+
+    gdf_final = pd.merge(map_df, gdf_final, on ="Kreis-Id", how="right")
+
+    print(gdf_final.head())
+    print(type(gdf_final['geometry']))
+    gdf_final = gpd.GeoDataFrame(gdf_final, geometry='geometry')
     
     gdf_final['geometry'] = gdf_final['geometry'].simplify(tolerance=0.001, preserve_topology=True)
     
@@ -83,8 +103,8 @@ folium.GeoJson(
         'fillOpacity': 0.8
     },
     popup=folium.GeoJsonPopup(
-        fields=['Kreis-Id', 'Prognose_dt_ha'],
-        aliases=['Landkreis ID:', 'Prognose (dt/ha):'],
+        fields=['Kreis-Id', 'Prognose_dt_ha', 'Stadt'],
+        aliases=['Landkreis ID:', 'Prognose (dt/ha):', 'Stadtname'],
         labels=True
     )
 ).add_to(m)
