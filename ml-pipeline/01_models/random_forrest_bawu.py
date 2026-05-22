@@ -82,8 +82,13 @@ mae = mean_absolute_error(y_test, y_pred)
 print(f"Mittlerer Fehler: {mae:.2f} Dezitonnen/Hektar")
 
 #Modellexport
-joblib.dump(model, 'rf_ertragsmodell.pkl')
+joblib.dump(model, '03_pkl-files/rf_ertragsmodell.pkl')
 
 # Test data export
 app_data_2024 = ertragsdaten_model[test_mask][['Kreis-Id'] + feature_cols]
-app_data_2024.to_csv('features_2024_für_app.csv', index=False)
+map_df = pd.DataFrame({
+      'Kreis-Id': bawu_ertrag['Kreis-Id'],
+      'Stadt': bawu_ertrag[' Stadt']
+    })
+app_data_2024 = pd.merge(map_df, app_data_2024, on ="Kreis-Id", how="right")
+app_data_2024.to_csv('02_features/features_2024_für_app.csv', index=False)
