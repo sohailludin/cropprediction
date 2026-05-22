@@ -8,8 +8,10 @@ import geopandas as gpd
 
 # bawu_ertrag = pd.read_csv('/Users/sohailludin/Desktop/01 Arbeit/01 Universität /03 Master/02 2. Semester/06 Softwarearchitekturen/Labor/cropprediction/data/clean/winterweizen_geerntet.csv')
 bawu_ertrag = pd.read_csv('/Users/sohailludin/Desktop/01 Arbeit/01 Universität /03 Master/02 2. Semester/06 Softwarearchitekturen/Labor/cropprediction/data/yield_pipeline/clean/bawu_winterweizen_geerntet.csv')
-nvdi_model = pd.read_csv("/Users/sohailludin/Desktop/01 Arbeit/01 Universität /03 Master/02 2. Semester/06 Softwarearchitekturen/Labor/cropprediction/data/openeo_downloads/NDVI_BaWu_2023_2024_Complete.csv")
+nvdi_model = pd.read_csv('/Users/sohailludin/Desktop/01 Arbeit/01 Universität /03 Master/02 2. Semester/06 Softwarearchitekturen/Labor/cropprediction/data/cdse_data/data/03_processed/Crop_Prediction_BaWu_2023_2024.csv')
 gdf = gpd.read_file("/Users/sohailludin/Desktop/01 Arbeit/01 Universität /03 Master/02 2. Semester/06 Softwarearchitekturen/Labor/cropprediction/data/geodaten_pipeline/processed/landkreise_bawu_sauber.geojson")
+weather_model = pd.read_csv('/Users/sohailludin/Desktop/01 Arbeit/01 Universität /03 Master/02 2. Semester/06 Softwarearchitekturen/Labor/cropprediction/data/cdse_data/data/03_processed/Crop_Prediction_BaWu_2023_2024.csv')
+
 
 # #Dummy Daten
 # np.random.seed(42)
@@ -26,23 +28,30 @@ mapping_df = pd.DataFrame({
       'Kreis-Id': gdf['ARS']
 })
 
+
 nvdi_model = pd.merge(nvdi_model, mapping_df, on ="feature_index", how="left")
 
 nvdi_model['Jahr'] = pd.to_datetime(nvdi_model['date']).dt.year
+weather_model['Jahr'] = pd.to_datetime(weather_model['date']).dt.year
 
 bawu_ertrag['Kreis-Id'] = bawu_ertrag['Kreis-Id'].astype(int)
 nvdi_model['Kreis-Id'] = nvdi_model['Kreis-Id'].astype(int)
 
+
 bawu_ertrag = bawu_ertrag.dropna(subset=['Winterweizen'])
 
-ertragsdaten_model = pd.merge(nvdi_model, bawu_ertrag, on=['Kreis-Id', 'Jahr'], how = 'inner')
+ertragsdaten_model = pd.merge(nvdi_model, bawu_ertrag,  on=['Kreis-Id', 'Jahr'], how = 'inner')
 
 ertragsdaten_model = ertragsdaten_model.rename(columns={'band_unnamed': 'NDVI'})
+ertragsdaten_model = ertragsdaten_model.rename(columns={'temperature-mean': 'Temperatur'})
+ertragsdaten_model = ertragsdaten_model.rename(columns={'precipitation-flux': 'Niederschlagsrate'})
+ertragsdaten_model = ertragsdaten_model.rename(columns={'solar-radiation-flux': 'Bestrahlungsstärke'})
+
 
 
 
 #Feature Engineering
-feature_cols = ['NDVI']
+feature_cols = ['NDVI', 'Temperatur', 'Niederschlagsrate','Bestrahlungsstärke' ]
 X = ertragsdaten_model[feature_cols] #Input Variablen
 y = ertragsdaten_model[['Winterweizen']] #Output Variable, dt/ha , 1 Dezitonne = 100 kg
 
