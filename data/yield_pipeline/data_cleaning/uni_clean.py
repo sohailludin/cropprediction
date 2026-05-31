@@ -30,7 +30,7 @@ file['Winterweizen'].astype(str).str.replace(",", ".")
 
 file['Winterweizen'] = pd.to_numeric(file['Winterweizen'], errors = 'coerce')
 
-file_winterweizen_yield = ".../data/clean/FILE_NAME.csv"
+file_winterweizen_yield = ".../data/clean/{FILE_NAME}.csv"
 
 file.to_csv(file_winterweizen_yield)
 
