@@ -1,8 +1,8 @@
 from pathlib import Path
 from src import utils, load_ndvi, load_weather, data_fusion
 
-START_DATE = "2023-01-01"
-END_DATE = "2024-12-31"
+START_DATE = "2016-01-01"
+END_DATE = "2025-12-31"
 
 GEOJSON_PATH = "data/01_geodata/landkreise_bawu_sauber.geojson"
 SPATIAL_EXTENT = {"west": 7.5, "south": 47.5, "east": 10.5, "north": 49.8}
