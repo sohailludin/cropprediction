@@ -9,7 +9,7 @@ SPATIAL_EXTENT = {"west": 7.5, "south": 47.5, "east": 10.5, "north": 49.8}
 
 RAW_DIR_NDVI = Path("data/02_raw_chunks/ndvi")
 RAW_DIR_WEATHER = Path("data/02_raw_chunks/weather")
-FINAL_OUTPUT_FILE = Path("data/03_processed/Crop_Prediction_BaWu_2023_2024.csv")
+FINAL_OUTPUT_FILE = Path("data/03_processed/Crop_Prediction_BaWu_2016_2025.csv")
 
 if __name__ == "__main__":
     print("Start data aggergation")
