@@ -1,7 +1,7 @@
 import optuna 
 import joblib
 import sklearn
-from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
+from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor, HistGradientBoostingRegressor
 from sklearn.model_selection import cross_val_score
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 
@@ -19,11 +19,12 @@ def tune_hyperparameters(X, y, model_type, n_trials = 20):
 
         elif model_type == 'GB':
             params = {
-            'n_estimators': trial.suggest_int("n_estimators", 10, 200, log = True),
+            #'n_estimators': trial.suggest_int("n_estimators", 10, 200, log = True),
             "max_depth": trial.suggest_int("max_depth", 2, 32),
-            'learning_rate': trial.suggest_float('learning_rate', 0.01, 0.1)
+            'learning_rate': trial.suggest_float('learning_rate', 0.01, 0.1),
+            'max_iter': trial.suggest_int('max_iter', 1, 200)
             }
-            model = GradientBoostingRegressor(**params, random_state=42)
+            model = HistGradientBoostingRegressor(**params, random_state=42)
 
         score = cross_val_score(model, X, y, cv=3, scoring='neg_mean_absolute_error').mean()
         return score
@@ -41,7 +42,7 @@ def train_and_save_model(X_train, y_train, X_test, y_test, model_type, best_para
         model = RandomForestRegressor(**best_params, random_state=42)
     elif model_type == 'GB':
         print(f"Starte Training mit {len(X_train)} Zeilen...")
-        model = GradientBoostingRegressor(**best_params, random_state=42)
+        model = HistGradientBoostingRegressor(**best_params, random_state=42)
     
     #Modelltraining
     model.fit(X_train, y_train)

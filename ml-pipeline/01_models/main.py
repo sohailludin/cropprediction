@@ -22,8 +22,8 @@ test_mask = bawu_df['Jahr'] > 2023
 X_train, y_train = X[train_mask], y[train_mask]
 X_test, y_test = X[test_mask], y[test_mask]
 
-random_forrest = train_and_save_model(X_train, y_train, X_test, y_test, 'RF', rf_parameters, '../03_pkl-files/rf_ertragsmodell.pkl')
-gradient_boost = train_and_save_model(X_train, y_train, X_test, y_test, 'GB', gb_parameters, '../03_pkl-files/gb_ertragsmodell.pkl')
+random_forrest = train_and_save_model(X_train, y_train, X_test, y_test, 'RF', rf_parameters, {'../03_pkl-files/rf_ertragsmodell.pkl'})
+gradient_boost = train_and_save_model(X_train, y_train, X_test, y_test, 'GB', gb_parameters, {'../03_pkl-files/gb_ertragsmodell.pkl'})
 
 
 

@@ -5,45 +5,35 @@ from streamlit_folium import st_folium
 import pandas as pd
 import joblib
 import branca.colormap as cm
-from shapely.wkt import loads
 
 
-@st.cache_resource
-def load_rf_model():
-    return joblib.load('../ml-pipeline/03_pkl-files/rf_ertragsmodell.pkl')
 
 @st.cache_data
 def get_predictions():
     gdf = gpd.read_file("../data/cdse_data/data/01_geodata/landkreise_bawu_sauber.geojson")
     
-    input_data = pd.read_csv('../ml-pipeline/02_features/features_2024_für_app.csv')
+    input_data = pd.read_csv('../ml-pipeline/02_features/predictions.csv')
 
     for col in gdf.select_dtypes(include=['datetime64', 'datetimetz']).columns:
         gdf[col] = gdf[col].astype(str)
             
-    for col in input_data.select_dtypes(include=['datetime64', 'datetimetz']).columns:
-        input_data[col] = input_data[col].astype(str)
-    
-    model = load_rf_model()
-    feature_cols = ['NDVI', 'Temperatur', 'Niederschlagsrate', 'Bestrahlungsstärke']
-    input_data['Prognose_dt_ha'] = model.predict(input_data[feature_cols])
     
     input_data['Kreis-Id'] = input_data['Kreis-Id'].astype(str).str.zfill(5)
     gdf['ARS'] = gdf['ARS'].astype(str).str.zfill(5)
     
-    gdf_final = gdf.merge(input_data[['Kreis-Id', 'Prognose_dt_ha']], left_on='ARS', right_on='Kreis-Id', how='left')
+    gdf_final = gdf.merge(input_data[['Kreis-Id', 'Prognose_dt_ha', 'Stadt']], left_on='ARS', right_on='Kreis-Id', how='left')
     
     gdf_final['Kreis-Id'] = gdf_final['Kreis-Id'].astype(str)
 
-    #print(gdf_final.head())
-    #print(type(gdf_final['geometry']))
+   
     gdf_final = gpd.GeoDataFrame(gdf_final, geometry='geometry')
     
-    gdf_final['geometry'] = gdf_final['geometry'].simplify(tolerance=0.001, preserve_topology=True)
+    gdf_final['geometry'] = gdf_final['geometry'].simplify(tolerance=0.01, preserve_topology=True)
     
     return gdf_final
 
 st.title("Ertragsprognose Baden-Württemberg")
+
 
 gdf = get_predictions()
 
@@ -90,8 +80,8 @@ folium.GeoJson(
         'fillOpacity': 0.8
     },
     popup=folium.GeoJsonPopup(
-        fields=['Kreis-Id', 'Prognose_dt_ha'],
-        aliases=['Landkreis ID:', 'Prognose (dt/ha):'],
+        fields=['Kreis-Id', 'Prognose_dt_ha', 'Stadt'],
+        aliases=['Landkreis ID:', 'Prognose (dt/ha):', 'Name'],
         labels=True
     )
 ).add_to(m)
