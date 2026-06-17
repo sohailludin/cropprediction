@@ -10,7 +10,7 @@ class Bundesland:
   def load_and_prepare_data(self):
       
       self.ertrag = pd.read_csv(f'../../data/yield_pipeline/clean/{self.name}_winterweizen_geerntet.csv')
-      self.nvdimodel = pd.read_csv('../../data/cdse_data/data/03_processed/Crop_Prediction_BaWu_2023_2024.csv')
+      self.nvdimodel = pd.read_csv('../../data/cdse_data/data/03_processed/Crop_Prediction_BaWu_2016_to_2025.csv')
       self.gdf = gpd.read_file(f"../../data/geodaten_pipeline/processed/landkreise_{self.name}_sauber.geojson")
       
       mapping_df = pd.DataFrame({
@@ -25,7 +25,14 @@ class Bundesland:
       self.nvdimodel['Kreis-Id'] = self.nvdimodel['Kreis-Id'].astype(int)
       self.ertrag = self.ertrag.dropna(subset=['Winterweizen'])
 
-      self.ertragsdaten_model = pd.merge(self.nvdimodel, self.ertrag,  on=['Kreis-Id', 'Jahr'], how = 'inner')
+      nvdimodel = self.nvdimodel.groupby(['Kreis-Id', 'Jahr']).agg({
+              'band_unnamed': 'mean',           # Durchschnittlicher NDVI
+              'temperature-mean': 'mean',       # Durchschnittstemperatur
+              'solar-radiation-flux': 'mean',   # Durchschnittliche Sonne
+              'precipitation-flux': 'sum'       # Gesamter Niederschlag im Jahr
+          }).reset_index()
+
+      self.ertragsdaten_model = pd.merge(nvdimodel, self.ertrag,  on=['Kreis-Id', 'Jahr'], how = 'inner')
       self.ertragsdaten_model = self.ertragsdaten_model.rename(columns={
          'band_unnamed': 'NDVI',
          'temperature-mean': 'Temperatur',
@@ -44,7 +51,7 @@ def test_data_export(dataframe, test_mask, feature_cols, name):
         'Kreis-Id' : stadt_daten['Kreis-Id'],
         'Stadt' : stadt_daten[' Stadt']})
      data = pd.merge(data, df, on='Kreis-Id', how="right")
-     data.to_csv(f'../02_features/{name}_features_2024_für_app.csv', index=False)
+     data.to_csv(f'../02_features/{name}_features_2025_für_app.csv', index=False)
 
      return data
 

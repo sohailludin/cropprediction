@@ -1,5 +1,6 @@
 from utils import Bundesland, test_data_export
 from ml_pipeline import  tune_hyperparameters, train_and_save_model
+from prediction import check_model_predictions
 
 bawu = Bundesland(name = "bawu")
 
@@ -22,9 +23,10 @@ test_mask = bawu_df['Jahr'] > 2023
 X_train, y_train = X[train_mask], y[train_mask]
 X_test, y_test = X[test_mask], y[test_mask]
 
-random_forrest = train_and_save_model(X_train, y_train, X_test, y_test, 'RF', rf_parameters, {'../03_pkl-files/rf_ertragsmodell.pkl'})
-gradient_boost = train_and_save_model(X_train, y_train, X_test, y_test, 'GB', gb_parameters, {'../03_pkl-files/gb_ertragsmodell.pkl'})
-
+random_forrest = train_and_save_model(X_train, y_train, X_test, y_test, 'RF', rf_parameters, '../03_pkl-files/rf_ertragsmodell.pkl')
+gradient_boost = train_and_save_model(X_train, y_train, X_test, y_test, 'GB', gb_parameters, '../03_pkl-files/gb_ertragsmodell.pkl')
 
 
 export = test_data_export(bawu_df, test_mask, feature_cols, name = "bawu")
+
+#predictions = check_model_predictions(y_test, X_test)
