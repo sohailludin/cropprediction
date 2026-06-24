@@ -46,7 +46,7 @@ class Bundesland:
 
 def test_data_export(dataframe, test_mask, feature_cols, name):
      stadt_daten = pd.read_csv(f'../../data/yield_pipeline/clean/{name}_winterweizen_geerntet.csv')
-     data = dataframe[test_mask] [['Kreis-Id'] + feature_cols]
+     data = dataframe[test_mask] [['Kreis-Id'] + feature_cols] 
      df = pd.DataFrame({
         'Kreis-Id' : stadt_daten['Kreis-Id'],
         'Stadt' : stadt_daten[' Stadt']})

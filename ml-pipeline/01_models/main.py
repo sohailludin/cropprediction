@@ -1,6 +1,6 @@
 from utils import Bundesland, test_data_export
 from ml_pipeline import  tune_hyperparameters, train_and_save_model
-from prediction import check_model_predictions
+from prediction import make_prediction
 
 bawu = Bundesland(name = "bawu")
 
@@ -28,5 +28,7 @@ gradient_boost = train_and_save_model(X_train, y_train, X_test, y_test, 'GB', gb
 
 
 export = test_data_export(bawu_df, test_mask, feature_cols, name = "bawu")
+
+prediction = make_prediction()
 
 #predictions = check_model_predictions(y_test, X_test)

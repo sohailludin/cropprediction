@@ -9,10 +9,10 @@ def load_gb_model():
 def load_rf_model():
     return joblib.load("../03_pkl-files/rf_ertragsmodell.pkl")
 
-def make_prediction_old():
+def make_prediction():
     model = load_gb_model()
     
-    input_data = pd.read_csv('../02_features/bawu_features_2024_für_app.csv')
+    input_data = pd.read_csv('../02_features/bawu_features_2025_für_app.csv')
     feature_cols = ['NDVI', 'Temperatur', 'Niederschlagsrate', 'Bestrahlungsstärke']
     input_data['Prognose_dt_ha'] = model.predict(input_data[feature_cols])
 

@@ -5,6 +5,7 @@ from streamlit_folium import st_folium
 import pandas as pd
 import joblib
 import branca.colormap as cm
+from charts import load_average, durchschnitt_feature_wert
 
 
 
@@ -30,6 +31,8 @@ def get_predictions():
     
     gdf_final['geometry'] = gdf_final['geometry'].simplify(tolerance=0.01, preserve_topology=True)
     
+    print("Daten erfolgreich transformiert")
+
     return gdf_final
 
 st.title("Ertragsprognose Baden-Württemberg")
@@ -52,6 +55,10 @@ if pd.isna(min_yield): min_yield, max_yield = 0, 100
 colormap = cm.linear.YlGn_09.scale(min_yield, max_yield)
 colormap.caption = 'Prognostizierter Ertrag (dt/ha)'
 
+
+#Ab hier beginnt die Karten Erstellung
+print("Karte wird erstellt")
+
 # map creation    
 m = folium.Map(location=[48.5, 9.0], zoom_start=8, tiles=None)
 
@@ -60,6 +67,8 @@ folium.TileLayer(
     attr='Esri', name='Satellitenbild'
 ).add_to(m)
 
+
+print("Karte wird weiter fertigestellt")
 # 3. Das Choropleth-Objekt mit Highlight-Effekt
 # Wir nutzen hier eine GeoJson-Ebene direkt, da sie feiner steuerbar ist als das Standard-Choropleth
 folium.GeoJson(
@@ -81,7 +90,7 @@ folium.GeoJson(
     },
     popup=folium.GeoJsonPopup(
         fields=['Kreis-Id', 'Prognose_dt_ha', 'Stadt'],
-        aliases=['Landkreis ID:', 'Prognose (dt/ha):', 'Name'],
+        aliases=['Name', 'Landkreis ID:', 'Prognose (dt/ha):'],
         labels=True
     )
 ).add_to(m)
@@ -89,14 +98,34 @@ folium.GeoJson(
 # 4. Legende zur Karte hinzufügen
 colormap.add_to(m)
 
+
+print("Karte wurde fertiggestellt")
+
+
 st_data = st_folium(
     m, 
     width=800, 
     height=600,
     key='bw_map',
-    returned_objects=[],
+    returned_objects=['last_active_drawing'],
     zoom=8
 )
 
+data = load_average()
 
+if st_data is not None and st_data.get('last_active_drawing') is not None:
+    label_id = st_data['last_active_drawing']['properties']['Kreis-Id']
+    stadt_name = st_data['last_active_drawing']['properties']["Stadt"]
+
+    st.subheader(f"Analyse für {stadt_name}")
+
+    
+    plot = durchschnitt_feature_wert("Winterweizen", data, int(label_id))
+    ndvi = durchschnitt_feature_wert("NDVI", data, int(label_id))
+
+
+    
+else:
+    # Das wird angezeigt, wenn die App frisch lädt und noch kein Klick passiert ist
+    st.info("👆 Klicke auf einen Landkreis auf der Karte, um den NDVI-Verlauf zu sehen.")
 
