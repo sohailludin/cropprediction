@@ -26,8 +26,9 @@ X_test, y_test = X[test_mask], y[test_mask]
 random_forrest = train_and_save_model(X_train, y_train, X_test, y_test, 'RF', rf_parameters, '../03_pkl-files/rf_ertragsmodell.pkl')
 gradient_boost = train_and_save_model(X_train, y_train, X_test, y_test, 'GB', gb_parameters, '../03_pkl-files/gb_ertragsmodell.pkl')
 
+test_prediction = bawu_df['Jahr'] <= 2025
 
-export = test_data_export(bawu_df, test_mask, feature_cols, name = "bawu")
+export = test_data_export(bawu_df, test_prediction, feature_cols, name = "bawu")
 
 prediction = make_prediction()
 
