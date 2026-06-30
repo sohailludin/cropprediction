@@ -43,8 +43,21 @@ gdf = get_predictions()
 # remove blue highlight when clicking
 st.markdown("""
     <style>
+    /* 1. Remove blue highlight when clicking map shapes */
     path.leaflet-interactive:focus {
         outline: none;
+    }
+    
+    /* 2. Completely disable Streamlit's gray/faded overlay during reruns */
+    div[data-stale="true"] {
+        opacity: 1 !important;
+        filter: none !important;
+        transition: none !important;
+    }
+    
+    /* 3. Safety net to ensure containers stay fully bright while processing clicks */
+    [data-testid="element-container"] {
+        opacity: 1 !important;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -74,8 +87,6 @@ print("Karte wird weiter fertigestellt")
 folium.GeoJson(
     gdf,
     style_function=lambda x: {
-        # Hier ist der Trick: 
-        # Wir prüfen, ob der Wert existiert. Wenn ja -> Colormap, wenn nein -> Grau.
         'fillColor': colormap(x['properties']['Prognose_dt_ha']) 
                      if pd.notna(x['properties']['Prognose_dt_ha']) 
                      else '#4a4a4a', # Das Grau für "No Data"
@@ -127,5 +138,5 @@ if st_data is not None and st_data.get('last_active_drawing') is not None:
     
 else:
     # Das wird angezeigt, wenn die App frisch lädt und noch kein Klick passiert ist
-    st.info("👆 Klicke auf einen Landkreis auf der Karte, um den Verlauf für die Winterweizen Produktion und den NDVI zu sehen.")
+    st.info("Klicke auf einen Landkreis auf der Karte, um den Verlauf für die Winterweizen Produktion und den NDVI zu sehen.")
 
