@@ -29,7 +29,7 @@ class Bundesland:
               'band_unnamed': 'mean',           # Durchschnittlicher NDVI
               'temperature-mean': 'mean',       # Durchschnittstemperatur
               'solar-radiation-flux': 'mean',   # Durchschnittliche Sonne
-              'precipitation-flux': 'sum'       # Gesamter Niederschlag im Jahr
+              'precipitation-flux': 'mean'       # Gesamter Niederschlag im Jahr
           }).reset_index()
 
       self.ertragsdaten_model = pd.merge(nvdimodel, self.ertrag,  on=['Kreis-Id', 'Jahr'], how = 'inner')
@@ -42,6 +42,50 @@ class Bundesland:
       self.ertragsdaten_model = self.ertragsdaten_model.dropna()
 
       return self.ertragsdaten_model
+  
+
+
+def prepare_prediction(dataframe):
+      stadt_daten = pd.read_csv(f'../../data/yield_pipeline/clean/bawu_winterweizen_geerntet.csv')
+      nvdimodel = pd.read_csv('../../data/cdse_data/data/03_processed/Crop_Prediction_BaWu_2026.csv')
+      gdf = gpd.read_file(f"../../data/geodaten_pipeline/processed/landkreise_bawu_sauber.geojson")
+      
+      mapping_df = pd.DataFrame({
+        'feature_index': gdf.index,
+        'Kreis-Id': gdf['ARS']})
+      
+      nvdimodel = pd.merge(nvdimodel, mapping_df, on ="feature_index", how="left")
+
+      nvdimodel['Jahr'] = pd.to_datetime(nvdimodel['date']).dt.year
+
+      nvdimodel['Kreis-Id'] = nvdimodel['Kreis-Id'].astype(int)
+   
+
+      nvdimodel = nvdimodel.groupby(['Kreis-Id', 'Jahr']).agg({
+              'band_unnamed': 'mean',           # Durchschnittlicher NDVI
+              'temperature-mean': 'mean',       # Durchschnittstemperatur
+              'solar-radiation-flux': 'mean',   # Durchschnittliche Sonne
+              'precipitation-flux': 'mean'       # Gesamter Niederschlag im Jahr
+          }).reset_index()
+
+    
+      prediction_model = nvdimodel.rename(columns={
+         'band_unnamed': 'NDVI',
+         'temperature-mean': 'Temperatur',
+          'precipitation-flux': 'Niederschlagsrate',
+        'solar-radiation-flux': 'Bestrahlungsstärke'})
+      
+      prediction_model = prediction_model.dropna()
+
+      df = pd.DataFrame({
+        'Kreis-Id' : stadt_daten['Kreis-Id'],
+        'Stadt' : stadt_daten[' Stadt']})
+      
+      prediction_model = pd.merge(prediction_model, df, on='Kreis-Id', how="right")
+
+      return prediction_model
+
+    
   
 
 def test_data_export(dataframe, test_mask, feature_cols, name):

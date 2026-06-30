@@ -1,4 +1,4 @@
-from utils import Bundesland, test_data_export
+from utils import Bundesland, test_data_export, prepare_prediction
 from ml_pipeline import  tune_hyperparameters, train_and_save_model
 from prediction import make_prediction
 
@@ -26,10 +26,12 @@ X_test, y_test = X[test_mask], y[test_mask]
 random_forrest = train_and_save_model(X_train, y_train, X_test, y_test, 'RF', rf_parameters, '../03_pkl-files/rf_ertragsmodell.pkl')
 gradient_boost = train_and_save_model(X_train, y_train, X_test, y_test, 'GB', gb_parameters, '../03_pkl-files/gb_ertragsmodell.pkl')
 
-test_prediction = bawu_df['Jahr'] <= 2025
+bawu_prediction = "../../data/03_processed/data/cdse_data/data/03_processed/Crop_Prediction_BaWu_2026.csv"
 
-export = test_data_export(bawu_df, test_prediction, feature_cols, name = "bawu")
+bawu_pd = prepare_prediction(bawu_prediction)
 
-prediction = make_prediction()
+#export = test_data_export(bawu_df, bawu_pd, feature_cols, name = "bawu")
+
+prediction = make_prediction(bawu_pd)
 
 #predictions = check_model_predictions(y_test, X_test)
