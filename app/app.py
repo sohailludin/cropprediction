@@ -90,7 +90,7 @@ folium.GeoJson(
     },
     popup=folium.GeoJsonPopup(
         fields=['Kreis-Id', 'Prognose_dt_ha', 'Stadt'],
-        aliases=['Name', 'Landkreis ID:', 'Prognose (dt/ha):'],
+        aliases=['Landkreis ID', 'Prognose (dt/ha):', 'Landkreis Name:'],
         labels=True
     )
 ).add_to(m)
@@ -127,5 +127,5 @@ if st_data is not None and st_data.get('last_active_drawing') is not None:
     
 else:
     # Das wird angezeigt, wenn die App frisch lädt und noch kein Klick passiert ist
-    st.info("👆 Klicke auf einen Landkreis auf der Karte, um den NDVI-Verlauf zu sehen.")
+    st.info("👆 Klicke auf einen Landkreis auf der Karte, um den Verlauf für die Winterweizen Produktion und den NDVI zu sehen.")
 
