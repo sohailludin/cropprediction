@@ -87,8 +87,6 @@ print("Karte wird weiter fertigestellt")
 folium.GeoJson(
     gdf,
     style_function=lambda x: {
-        # Hier ist der Trick: 
-        # Wir prüfen, ob der Wert existiert. Wenn ja -> Colormap, wenn nein -> Grau.
         'fillColor': colormap(x['properties']['Prognose_dt_ha']) 
                      if pd.notna(x['properties']['Prognose_dt_ha']) 
                      else '#4a4a4a', # Das Grau für "No Data"
@@ -140,5 +138,5 @@ if st_data is not None and st_data.get('last_active_drawing') is not None:
     
 else:
     # Das wird angezeigt, wenn die App frisch lädt und noch kein Klick passiert ist
-    st.info("👆 Klicke auf einen Landkreis auf der Karte, um den Verlauf für die Winterweizen Produktion und den NDVI zu sehen.")
+    st.info("Klicke auf einen Landkreis auf der Karte, um den Verlauf für die Winterweizen Produktion und den NDVI zu sehen.")
 
