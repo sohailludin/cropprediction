@@ -43,8 +43,21 @@ gdf = get_predictions()
 # remove blue highlight when clicking
 st.markdown("""
     <style>
+    /* 1. Remove blue highlight when clicking map shapes */
     path.leaflet-interactive:focus {
         outline: none;
+    }
+    
+    /* 2. Completely disable Streamlit's gray/faded overlay during reruns */
+    div[data-stale="true"] {
+        opacity: 1 !important;
+        filter: none !important;
+        transition: none !important;
+    }
+    
+    /* 3. Safety net to ensure containers stay fully bright while processing clicks */
+    [data-testid="element-container"] {
+        opacity: 1 !important;
     }
     </style>
     """, unsafe_allow_html=True)
