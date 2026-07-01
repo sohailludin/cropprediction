@@ -41,12 +41,15 @@ Das Projekt ist modular aufgebaut und durchläuft folgende Kernprozesse:
 
 ```text
 cropprediction/
-├── data/               # Bereinigte CSV-Daten (Ertrag, Landkreise)
-│   └── load_data.py    # Lädt und bereinigt BKG-Daten für Landkreise
-├── data_cleaning/      # Skripte zur Datenbeschaffung und Bereinigung
-│   └── api_yield.py    # Asynchroner Download der GENESIS-Ertragsdaten
+├── data/               # Bereinigte Daten (Ertrag, Landkreise)
+│   └── cdse_data    # CDSE Pipeline
+│   └── geodaten_pipeline    # Lädt und bereinigt BKG-Daten für Landkreise
+│   └── openeo_downloads    # Dateiordner für fertige OpenEO Dateien in CSV-Format
+│   └── yield_pipeline    # Ertragsdaten Abruf via API Schnittstelle zu Regionalstatistik
 ├── ML-Pipeline/        # Skripte für Training und Validierung
-│   └── random_forest.py # Kern-Algorithmen (Regression, Gradient Boosting)
+│   └── 01_models # Kern-Algorithmen (Regression, Gradient Boosting)
+│   └── 02_features # Feature Export
+│   └── 03_pkl-files # PKL Files Export
 ├── app/
 │   └── app.py          # Interaktives Streamlit Frontend
 ├── requirements.txt    # Projektabhängigkeiten
